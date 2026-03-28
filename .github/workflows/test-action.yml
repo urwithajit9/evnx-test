@@ -1,0 +1,107 @@
+name: Test evnx-action from Marketplace
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test-scan-action:
+    name: Action — scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan secrets.env via Marketplace action
+        id: scan
+        uses: urwithajit9/evnx-action@v1
+        with:
+          command: scan
+          path: fixtures/secrets.env
+          format: github
+          exit_zero: "true"
+
+      - name: Show outputs
+        run: |
+          echo "Findings: ${{ steps.scan.outputs.findings }}"
+          echo "Exit code: ${{ steps.scan.outputs.exit_code }}"
+
+  test-validate-action:
+    name: Action — validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: urwithajit9/evnx-action@v1
+        with:
+          command: validate
+          env_file: fixtures/placeholders.env
+          exit_zero: "true"
+
+  test-diff-action:
+    name: Action — diff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up drift files
+        run: |
+          cp fixtures/drift.env .env
+          cp fixtures/drift.env.example .env.example
+
+      - uses: urwithajit9/evnx-action@v1
+        with:
+          command: diff
+          exit_zero: "true"
+
+  test-convert-action:
+    name: Action — convert
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy fixture as .env
+        run: cp fixtures/clean.env .env
+
+      - uses: urwithajit9/evnx-action@v1
+        with:
+          command: convert
+          convert_to: kubernetes
+          convert_output: k8s-secret.yaml
+
+      - name: Show converted output
+        run: cat k8s-secret.yaml
+
+  test-doctor-action:
+    name: Action — doctor
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: urwithajit9/evnx-action@v1
+        with:
+          command: doctor
+          exit_zero: "true"
+
+  test-scan-sarif-action:
+    name: Action — scan SARIF upload
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan and emit SARIF
+        uses: urwithajit9/evnx-action@v1
+        with:
+          command: scan
+          path: fixtures/secrets.env
+          format: sarif
+          exit_zero: "true"
+
+      - name: Upload SARIF to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: evnx-results.sarif
+        continue-on-error: true

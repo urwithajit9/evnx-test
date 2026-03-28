@@ -1,0 +1,16 @@
+# Protect real .env files at the repo root (created temporarily by CI diff steps)
+/.env
+/.env.example
+
+# Never commit converted output files that CI creates at root
+/k8s-secret.yaml
+/evnx-results.sarif
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp

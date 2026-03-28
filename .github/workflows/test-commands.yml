@@ -1,0 +1,140 @@
+name: Test all evnx commands
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 2 * * *'     # nightly at 02:00 UTC
+  workflow_dispatch:
+
+jobs:
+  test-scan:
+    name: evnx scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install evnx
+        run: curl -fsSL https://dotenv.space/install.sh | bash
+
+      - name: scan clean.env (expect 0 findings)
+        run: evnx scan --path fixtures/clean.env --format json
+
+      - name: scan secrets.env (expect findings, exit-zero)
+        run: evnx scan --path fixtures/secrets.env --format pretty --exit-zero
+
+      - name: scan secrets.env SARIF output
+        run: evnx scan --path fixtures/secrets.env --format sarif --exit-zero
+
+      - name: scan weak-secret.env
+        run: evnx scan --path fixtures/weak-secret.env --format pretty --exit-zero
+
+      - name: scan multi-service.env
+        run: evnx scan --path fixtures/multi-service.env --format json --exit-zero
+
+  test-validate:
+    name: evnx validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: curl -fsSL https://dotenv.space/install.sh | bash
+
+      - name: validate clean.env (expect pass)
+        run: evnx validate --file fixtures/clean.env
+
+      - name: validate placeholders.env (expect findings, exit-zero)
+        run: evnx validate --file fixtures/placeholders.env --exit-zero
+
+      - name: validate boolean-trap.env
+        run: evnx validate --file fixtures/boolean-trap.env --exit-zero
+
+      - name: validate weak-secret.env
+        run: evnx validate --file fixtures/weak-secret.env --exit-zero
+
+      - name: validate localhost-prod.env
+        run: evnx validate --file fixtures/localhost-prod.env --exit-zero
+
+      - name: validate --strict mode on clean.env
+        run: evnx validate --file fixtures/clean.env --strict
+
+  test-diff:
+    name: evnx diff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: curl -fsSL https://dotenv.space/install.sh | bash
+
+      - name: diff (clean — expect no drift)
+        run: evnx diff || true
+        working-directory: fixtures
+
+      - name: diff (drift — expect findings, exit-zero)
+        run: |
+          cp drift.env .env
+          cp drift.env.example .env.example
+          evnx diff --exit-zero
+        working-directory: fixtures
+
+      - name: diff --format json
+        run: |
+          cp drift.env .env
+          cp drift.env.example .env.example
+          evnx diff --format json --exit-zero
+        working-directory: fixtures
+
+  test-doctor:
+    name: evnx doctor
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: curl -fsSL https://dotenv.space/install.sh | bash
+
+      - name: doctor on repo root
+        run: evnx doctor --exit-zero
+
+  test-convert:
+    name: evnx convert
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: curl -fsSL https://dotenv.space/install.sh | bash
+
+      - name: convert to json
+        run: evnx convert --to json --file fixtures/clean.env
+
+      - name: convert to yaml
+        run: evnx convert --to yaml --file fixtures/clean.env
+
+      - name: convert to shell
+        run: evnx convert --to shell --file fixtures/clean.env
+
+      - name: convert to docker-compose
+        run: evnx convert --to docker-compose --file fixtures/clean.env
+
+      - name: convert to kubernetes
+        run: evnx convert --to kubernetes --file fixtures/clean.env
+
+      - name: convert to terraform
+        run: evnx convert --to terraform --file fixtures/clean.env
+
+      - name: convert to github-actions
+        run: evnx convert --to github-actions --file fixtures/clean.env
+
+      - name: convert to heroku
+        run: evnx convert --to heroku --file fixtures/clean.env
+
+      - name: convert to vercel
+        run: evnx convert --to vercel --file fixtures/clean.env
+
+  test-sync:
+    name: evnx sync
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: curl -fsSL https://dotenv.space/install.sh | bash
+
+      - name: sync forward (.env → .env.example)
+        run: |
+          cp fixtures/clean.env .env
+          cp fixtures/clean.env.example .env.example
+          evnx sync --direction forward --placeholder

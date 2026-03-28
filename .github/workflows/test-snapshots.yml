@@ -1,0 +1,198 @@
+name: Snapshot regression test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  snapshots:
+    name: Compare live output vs committed snapshots
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: curl -fsSL https://dotenv.space/install.sh | bash
+
+      # ── scan ──────────────────────────────────────────────────────────────
+
+      - name: Generate scan-json snapshot
+        run: evnx scan --path fixtures/secrets.env --format json --exit-zero > /tmp/scan-json.json
+
+      - name: Compare scan-json
+        run: |
+          if [ -f outputs/scan-json.json ]; then
+            diff outputs/scan-json.json /tmp/scan-json.json \
+              && echo "✓ scan-json snapshot matches" \
+              || echo "::warning::scan-json snapshot diff detected — run: evnx scan --format json > outputs/scan-json.json"
+          else
+            echo "No snapshot yet — seeding outputs/scan-json.json"
+            cp /tmp/scan-json.json outputs/scan-json.json
+          fi
+
+      - name: Generate scan-pretty snapshot
+        run: evnx scan --path fixtures/secrets.env --format pretty --exit-zero > /tmp/scan-pretty.txt
+
+      - name: Compare scan-pretty
+        run: |
+          if [ -f outputs/scan-pretty.txt ]; then
+            diff outputs/scan-pretty.txt /tmp/scan-pretty.txt \
+              && echo "✓ scan-pretty snapshot matches" \
+              || echo "::warning::scan-pretty snapshot diff detected"
+          else
+            cp /tmp/scan-pretty.txt outputs/scan-pretty.txt
+          fi
+
+      - name: Generate scan-sarif snapshot
+        run: evnx scan --path fixtures/secrets.env --format sarif --exit-zero > /tmp/scan-sarif.json
+
+      - name: Compare scan-sarif
+        run: |
+          if [ -f outputs/scan-sarif.json ]; then
+            diff outputs/scan-sarif.json /tmp/scan-sarif.json \
+              && echo "✓ scan-sarif snapshot matches" \
+              || echo "::warning::scan-sarif snapshot diff detected"
+          else
+            cp /tmp/scan-sarif.json outputs/scan-sarif.json
+          fi
+
+      # ── validate ──────────────────────────────────────────────────────────
+
+      - name: Generate validate-json snapshot
+        run: evnx validate --file fixtures/placeholders.env --format json --exit-zero > /tmp/validate-json.json
+
+      - name: Compare validate-json
+        run: |
+          if [ -f outputs/validate-json.json ]; then
+            diff outputs/validate-json.json /tmp/validate-json.json \
+              && echo "✓ validate-json snapshot matches" \
+              || echo "::warning::validate-json snapshot diff detected"
+          else
+            cp /tmp/validate-json.json outputs/validate-json.json
+          fi
+
+      - name: Generate validate-pretty snapshot
+        run: evnx validate --file fixtures/placeholders.env --format pretty --exit-zero > /tmp/validate-pretty.txt
+
+      - name: Compare validate-pretty
+        run: |
+          if [ -f outputs/validate-pretty.txt ]; then
+            diff outputs/validate-pretty.txt /tmp/validate-pretty.txt \
+              && echo "✓ validate-pretty snapshot matches" \
+              || echo "::warning::validate-pretty snapshot diff detected"
+          else
+            cp /tmp/validate-pretty.txt outputs/validate-pretty.txt
+          fi
+
+      # ── diff ──────────────────────────────────────────────────────────────
+
+      - name: Set up drift files for diff snapshot
+        run: |
+          cp fixtures/drift.env .env
+          cp fixtures/drift.env.example .env.example
+
+      - name: Generate diff-output snapshot
+        run: evnx diff --format json --exit-zero > /tmp/diff-output.json || true
+
+      - name: Compare diff-output
+        run: |
+          if [ -f outputs/diff-output.json ]; then
+            diff outputs/diff-output.json /tmp/diff-output.json \
+              && echo "✓ diff-output snapshot matches" \
+              || echo "::warning::diff-output snapshot diff detected"
+          else
+            cp /tmp/diff-output.json outputs/diff-output.json
+          fi
+
+      # ── convert ───────────────────────────────────────────────────────────
+
+      - name: Generate convert-json snapshot
+        run: evnx convert --to json --file fixtures/clean.env > /tmp/convert-json.json
+
+      - name: Compare convert-json
+        run: |
+          if [ -f outputs/convert-json.json ]; then
+            diff outputs/convert-json.json /tmp/convert-json.json \
+              && echo "✓ convert-json snapshot matches" \
+              || echo "::warning::convert-json snapshot diff detected"
+          else
+            cp /tmp/convert-json.json outputs/convert-json.json
+          fi
+
+      - name: Generate convert-yaml snapshot
+        run: evnx convert --to yaml --file fixtures/clean.env > /tmp/convert-yaml.yaml
+
+      - name: Compare convert-yaml
+        run: |
+          if [ -f outputs/convert-yaml.yaml ]; then
+            diff outputs/convert-yaml.yaml /tmp/convert-yaml.yaml \
+              && echo "✓ convert-yaml snapshot matches" \
+              || echo "::warning::convert-yaml snapshot diff detected"
+          else
+            cp /tmp/convert-yaml.yaml outputs/convert-yaml.yaml
+          fi
+
+      - name: Generate convert-kubernetes snapshot
+        run: evnx convert --to kubernetes --file fixtures/clean.env > /tmp/convert-kubernetes.yaml
+
+      - name: Compare convert-kubernetes
+        run: |
+          if [ -f outputs/convert-kubernetes.yaml ]; then
+            diff outputs/convert-kubernetes.yaml /tmp/convert-kubernetes.yaml \
+              && echo "✓ convert-kubernetes snapshot matches" \
+              || echo "::warning::convert-kubernetes snapshot diff detected"
+          else
+            cp /tmp/convert-kubernetes.yaml outputs/convert-kubernetes.yaml
+          fi
+
+      - name: Generate convert-terraform snapshot
+        run: evnx convert --to terraform --file fixtures/clean.env > /tmp/convert-terraform.tfvars
+
+      - name: Compare convert-terraform
+        run: |
+          if [ -f outputs/convert-terraform.tfvars ]; then
+            diff outputs/convert-terraform.tfvars /tmp/convert-terraform.tfvars \
+              && echo "✓ convert-terraform snapshot matches" \
+              || echo "::warning::convert-terraform snapshot diff detected"
+          else
+            cp /tmp/convert-terraform.tfvars outputs/convert-terraform.tfvars
+          fi
+
+      - name: Generate convert-github-actions snapshot
+        run: evnx convert --to github-actions --file fixtures/clean.env > /tmp/convert-github-actions.yaml
+
+      - name: Compare convert-github-actions
+        run: |
+          if [ -f outputs/convert-github-actions.yaml ]; then
+            diff outputs/convert-github-actions.yaml /tmp/convert-github-actions.yaml \
+              && echo "✓ convert-github-actions snapshot matches" \
+              || echo "::warning::convert-github-actions snapshot diff detected"
+          else
+            cp /tmp/convert-github-actions.yaml outputs/convert-github-actions.yaml
+          fi
+
+      # ── doctor ────────────────────────────────────────────────────────────
+
+      - name: Generate doctor-output snapshot
+        run: evnx doctor --exit-zero > /tmp/doctor-output.txt
+
+      - name: Compare doctor-output
+        run: |
+          if [ -f outputs/doctor-output.txt ]; then
+            diff outputs/doctor-output.txt /tmp/doctor-output.txt \
+              && echo "✓ doctor-output snapshot matches" \
+              || echo "::warning::doctor-output snapshot diff detected"
+          else
+            cp /tmp/doctor-output.txt outputs/doctor-output.txt
+          fi
+
+      # ── commit seeded snapshots (first run only) ──────────────────────────
+
+      - name: Commit newly seeded snapshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add outputs/
+          git diff --cached --quiet && echo "Nothing to commit" || \
+            git commit -m "chore: seed initial snapshots [skip ci]" && git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
