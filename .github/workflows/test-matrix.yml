@@ -34,7 +34,7 @@ jobs:
         run: evnx --version
 
       - name: Scan fixtures
-        run: evnx scan --path fixtures/secrets.env --format pretty --exit-zero
+        run: evnx scan fixtures/secrets.env --format pretty --exit-zero
 
       - name: Validate fixtures
         run: evnx validate --file fixtures/placeholders.env --exit-zero
