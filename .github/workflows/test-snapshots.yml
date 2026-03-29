@@ -71,7 +71,7 @@ jobs:
           fi
 
       - name: Generate validate-pretty snapshot
-        run: evnx validate --env fixtures/placeholders.env --format pretty --exit-zero > /tmp/validate-pretty.txt
+        run: evnx validate --env fixtures/placeholders.env --example fixtures/clean.env.example --format pretty --exit-zero > /tmp/validate-pretty.txt
 
       - name: Compare validate-pretty
         run: |
