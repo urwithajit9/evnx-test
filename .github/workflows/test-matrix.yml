@@ -46,4 +46,4 @@ jobs:
         run: evnx convert --to json --env fixtures/clean.env
 
       - name: Doctor
-        run: evnx doctor --exit-zero
+        run: evnx doctor
