@@ -58,7 +58,7 @@ jobs:
       # ── validate ──────────────────────────────────────────────────────────
 
       - name: Generate validate-json snapshot
-        run: evnx validate --env fixtures/placeholders.env --format json --exit-zero > /tmp/validate-json.json
+        run: evnx validate --env fixtures/placeholders.env --example fixtures/clean.env.example --format json --exit-zero > /tmp/validate-json.json
 
       - name: Compare validate-json
         run: |
