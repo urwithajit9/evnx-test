@@ -173,7 +173,7 @@ jobs:
       # ── doctor ────────────────────────────────────────────────────────────
 
       - name: Generate doctor-output snapshot
-        run: evnx doctor --exit-zero > /tmp/doctor-output.txt
+        run: evnx doctor > /tmp/doctor-output.txt
 
       - name: Compare doctor-output
         run: |
