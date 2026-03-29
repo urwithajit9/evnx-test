@@ -14,16 +14,16 @@ jobs:
       - run: curl -fsSL https://dotenv.space/install.sh | bash
 
       - name: scan — pretty
-        run: evnx scan --path fixtures/secrets.env --format pretty --exit-zero
+        run: evnx scan fixtures/secrets.env --format pretty --exit-zero
 
       - name: scan — json
-        run: evnx scan --path fixtures/secrets.env --format json --exit-zero
+        run: evnx scan fixtures/secrets.env --format json --exit-zero
 
       - name: scan — sarif
-        run: evnx scan --path fixtures/secrets.env --format sarif --exit-zero
+        run: evnx scan fixtures/secrets.env --format sarif --exit-zero
 
       - name: scan — github (annotations)
-        run: evnx scan --path fixtures/secrets.env --format github --exit-zero
+        run: evnx scan fixtures/secrets.env --format github --exit-zero
 
   formats-validate:
     name: validate formats
@@ -33,13 +33,13 @@ jobs:
       - run: curl -fsSL https://dotenv.space/install.sh | bash
 
       - name: validate — pretty
-        run: evnx validate --file fixtures/placeholders.env --format pretty --exit-zero
+        run: evnx validate --env fixtures/placeholders.env --example fixtures/clean.env.example --format pretty --exit-zero
 
       - name: validate — json
-        run: evnx validate --file fixtures/placeholders.env --format json --exit-zero
+        run: evnx validate --env fixtures/placeholders.env --example fixtures/clean.env.example --format json --exit-zero
 
       - name: validate — github-actions (annotations)
-        run: evnx validate --file fixtures/placeholders.env --format github-actions --exit-zero
+        run: evnx validate --env fixtures/placeholders.env --example fixtures/clean.env.example --format github-actions --exit-zero
 
   formats-diff:
     name: diff formats
@@ -67,43 +67,43 @@ jobs:
       - run: curl -fsSL https://dotenv.space/install.sh | bash
 
       - name: convert — json
-        run: evnx convert --to json --file fixtures/clean.env
+        run: evnx convert --to json --env fixtures/clean.env
 
       - name: convert — yaml
-        run: evnx convert --to yaml --file fixtures/clean.env
+        run: evnx convert --to yaml --env fixtures/clean.env
 
       - name: convert — shell
-        run: evnx convert --to shell --file fixtures/clean.env
+        run: evnx convert --to shell --env fixtures/clean.env
 
       - name: convert — docker-compose
-        run: evnx convert --to docker-compose --file fixtures/clean.env
+        run: evnx convert --to docker-compose --env fixtures/clean.env
 
       - name: convert — kubernetes
-        run: evnx convert --to kubernetes --file fixtures/clean.env
+        run: evnx convert --to kubernetes --env fixtures/clean.env
 
       - name: convert — terraform
-        run: evnx convert --to terraform --file fixtures/clean.env
+        run: evnx convert --to terraform --env fixtures/clean.env
 
       - name: convert — github-actions
-        run: evnx convert --to github-actions --file fixtures/clean.env
+        run: evnx convert --to github-actions --env fixtures/clean.env
 
       - name: convert — aws-secrets
-        run: evnx convert --to aws-secrets --file fixtures/clean.env
+        run: evnx convert --to aws-secrets --env fixtures/clean.env
 
       - name: convert — gcp-secrets
-        run: evnx convert --to gcp-secrets --file fixtures/clean.env
+        run: evnx convert --to gcp-secrets --env fixtures/clean.env
 
       - name: convert — azure-keyvault
-        run: evnx convert --to azure-keyvault --file fixtures/clean.env
+        run: evnx convert --to azure-keyvault --env fixtures/clean.env
 
       - name: convert — heroku
-        run: evnx convert --to heroku --file fixtures/clean.env
+        run: evnx convert --to heroku --env fixtures/clean.env
 
       - name: convert — vercel
-        run: evnx convert --to vercel --file fixtures/clean.env
+        run: evnx convert --to vercel --env fixtures/clean.env
 
       - name: convert — railway
-        run: evnx convert --to railway --file fixtures/clean.env
+        run: evnx convert --to railway --env fixtures/clean.env
 
       - name: convert — doppler
-        run: evnx convert --to doppler --file fixtures/clean.env
+        run: evnx convert --to doppler --env fixtures/clean.env

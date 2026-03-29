@@ -18,19 +18,19 @@ jobs:
         run: curl -fsSL https://dotenv.space/install.sh | bash
 
       - name: scan clean.env (expect 0 findings)
-        run: evnx scan --path fixtures/clean.env --format json
+        run: evnx scan fixtures/clean.env --format json
 
       - name: scan secrets.env (expect findings, exit-zero)
-        run: evnx scan --path fixtures/secrets.env --format pretty --exit-zero
+        run: evnx scan fixtures/secrets.env --format pretty --exit-zero
 
       - name: scan secrets.env SARIF output
-        run: evnx scan --path fixtures/secrets.env --format sarif --exit-zero
+        run: evnx scan fixtures/secrets.env --format sarif --exit-zero
 
       - name: scan weak-secret.env
-        run: evnx scan --path fixtures/weak-secret.env --format pretty --exit-zero
+        run: evnx scan fixtures/weak-secret.env --format pretty --exit-zero
 
       - name: scan multi-service.env
-        run: evnx scan --path fixtures/multi-service.env --format json --exit-zero
+        run: evnx scan fixtures/multi-service.env --format json --exit-zero
 
   test-validate:
     name: evnx validate

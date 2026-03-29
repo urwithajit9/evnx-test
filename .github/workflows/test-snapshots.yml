@@ -16,7 +16,7 @@ jobs:
       # ── scan ──────────────────────────────────────────────────────────────
 
       - name: Generate scan-json snapshot
-        run: evnx scan --path fixtures/secrets.env --format json --exit-zero > /tmp/scan-json.json
+        run: evnx scan fixtures/secrets.env --format json --exit-zero > /tmp/scan-json.json
 
       - name: Compare scan-json
         run: |
@@ -30,7 +30,7 @@ jobs:
           fi
 
       - name: Generate scan-pretty snapshot
-        run: evnx scan --path fixtures/secrets.env --format pretty --exit-zero > /tmp/scan-pretty.txt
+        run: evnx scan fixtures/secrets.env --format pretty --exit-zero > /tmp/scan-pretty.txt
 
       - name: Compare scan-pretty
         run: |
@@ -43,7 +43,7 @@ jobs:
           fi
 
       - name: Generate scan-sarif snapshot
-        run: evnx scan --path fixtures/secrets.env --format sarif --exit-zero > /tmp/scan-sarif.json
+        run: evnx scan fixtures/secrets.env --format sarif --exit-zero > /tmp/scan-sarif.json
 
       - name: Compare scan-sarif
         run: |
@@ -58,7 +58,7 @@ jobs:
       # ── validate ──────────────────────────────────────────────────────────
 
       - name: Generate validate-json snapshot
-        run: evnx validate --file fixtures/placeholders.env --format json --exit-zero > /tmp/validate-json.json
+        run: evnx validate --env fixtures/placeholders.env --format json --exit-zero > /tmp/validate-json.json
 
       - name: Compare validate-json
         run: |
@@ -71,7 +71,7 @@ jobs:
           fi
 
       - name: Generate validate-pretty snapshot
-        run: evnx validate --file fixtures/placeholders.env --format pretty --exit-zero > /tmp/validate-pretty.txt
+        run: evnx validate --env fixtures/placeholders.env --format pretty --exit-zero > /tmp/validate-pretty.txt
 
       - name: Compare validate-pretty
         run: |
@@ -106,7 +106,7 @@ jobs:
       # ── convert ───────────────────────────────────────────────────────────
 
       - name: Generate convert-json snapshot
-        run: evnx convert --to json --file fixtures/clean.env > /tmp/convert-json.json
+        run: evnx convert --to json --env fixtures/clean.env > /tmp/convert-json.json
 
       - name: Compare convert-json
         run: |
@@ -119,7 +119,7 @@ jobs:
           fi
 
       - name: Generate convert-yaml snapshot
-        run: evnx convert --to yaml --file fixtures/clean.env > /tmp/convert-yaml.yaml
+        run: evnx convert --to yaml --env fixtures/clean.env > /tmp/convert-yaml.yaml
 
       - name: Compare convert-yaml
         run: |
@@ -132,7 +132,7 @@ jobs:
           fi
 
       - name: Generate convert-kubernetes snapshot
-        run: evnx convert --to kubernetes --file fixtures/clean.env > /tmp/convert-kubernetes.yaml
+        run: evnx convert --to kubernetes --env fixtures/clean.env > /tmp/convert-kubernetes.yaml
 
       - name: Compare convert-kubernetes
         run: |
@@ -145,7 +145,7 @@ jobs:
           fi
 
       - name: Generate convert-terraform snapshot
-        run: evnx convert --to terraform --file fixtures/clean.env > /tmp/convert-terraform.tfvars
+        run: evnx convert --to terraform --env fixtures/clean.env > /tmp/convert-terraform.tfvars
 
       - name: Compare convert-terraform
         run: |
@@ -158,7 +158,7 @@ jobs:
           fi
 
       - name: Generate convert-github-actions snapshot
-        run: evnx convert --to github-actions --file fixtures/clean.env > /tmp/convert-github-actions.yaml
+        run: evnx convert --to github-actions --env fixtures/clean.env > /tmp/convert-github-actions.yaml
 
       - name: Compare convert-github-actions
         run: |

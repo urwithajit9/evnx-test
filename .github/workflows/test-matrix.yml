@@ -37,13 +37,13 @@ jobs:
         run: evnx scan fixtures/secrets.env --format pretty --exit-zero
 
       - name: Validate fixtures
-        run: evnx validate --file fixtures/placeholders.env --exit-zero
+        run: evnx validate --env fixtures/placeholders.env --example fixtures/clean.env.example --exit-zero
 
       - name: Validate boolean-trap
-        run: evnx validate --file fixtures/boolean-trap.env --exit-zero
+        run: evnx validate --env fixtures/boolean-trap.env --example fixtures/clean.env.example --exit-zero
 
       - name: Convert to JSON
-        run: evnx convert --to json --file fixtures/clean.env
+        run: evnx convert --to json --env fixtures/clean.env
 
       - name: Doctor
         run: evnx doctor --exit-zero
